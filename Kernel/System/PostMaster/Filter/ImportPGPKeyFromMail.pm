@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2017 Perl-Services.de, http://perl-services.de
+# Copyright (C) 2017 - 2021 Perl-Services.de, http://perl-services.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -97,6 +97,8 @@ sub Run {
     return 1 if !@KeyFiles;
 
     for my $KeyFile ( @KeyFiles ) {
+        next if $KeyFile->{Content} =~ m{PGP \s+ SIGNATURE}xms;
+
         $PGPObject->KeyAdd(
             Key => $KeyFile->{Content},
         );

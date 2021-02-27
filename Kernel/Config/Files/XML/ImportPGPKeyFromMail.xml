@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_config version="2.0" init="Config">
+    <Setting Name="PostMaster::PreFilterModule###3-ImportPGPKey" Required="0" Valid="1">
+        <Description Translatable="1">Module to filter and manipulate incoming messages. Import PGP key.</Description>
+        <Navigation>Core::Email::PostMaster</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Module">Kernel::System::PostMaster::Filter::ImportPGPKeyFromMail</Item>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="ImportPGPKeyFromMail::SetDynamicField" Required="0" Valid="0">
+        <Description Translatable="1">DynamicField that stores whether a pgp key was imported or not.</Description>
+        <Navigation>Core::Email::PostMaster</Navigation>
+        <Value>
+            <Item ValueType="String" ValueRegex=""></Item>
+        </Value>
+    </Setting>
+    <Setting Name="Frontend::Output::FilterElementPost###SelectPGPKey" Required="0" Valid="1">
+        <Description Translatable="1">If a PGP key is selectable, then select it</Description>
+        <Navigation>Core::Crypt::PGP</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::FilterElementPost::SelectPGPKey</Item>
+                <Item Key="Templates">
+                    <Hash>
+                        <Item Key="AgentTicketCompose">1</Item>
+                        <Item Key="AgentTicketEmailOutbound">1</Item>
+                        <Item Key="AgentTicketEmail">1</Item>
+                        <Item Key="AgentTicketForward">1</Item>
+                        <Item Key="AgentTicketBounce">1</Item>
+                        <Item Key="AgentTicketActionCommon">1</Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="Frontend::Module###AgentCheckPGPKeyExists" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for agent interface.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration</Navigation>
+        <Value>
+            <Item ValueType="FrontendRegistration">
+                <Hash>
+                    <Item Key="GroupRo">
+                        <Array></Array>
+                    </Item>
+                    <Item Key="Group">
+                        <Array></Array>
+                    </Item>
+                    <Item Key="Description" Translatable="1">Check if PGP key exists for recipient</Item>
+                    <Item Key="NavBarName">Ticket</Item>
+                    <Item Key="Title" Translatable="1">Check if PGP key exists for recipient</Item>
+                </Hash>
+            </Item>
+        </Value>
+    </Setting>
+    <Setting Name="Frontend::Navigation###AgentCheckPGPKeyExists###002-ImportPGPKeyFromMail" Required="0" Valid="0">
+        <Description Translatable="1">Main menu item registration.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration::MainMenu</Navigation>
+        <Value>
+            <Array>
+                <DefaultItem ValueType="FrontendNavigation">
+                    <Hash>
+                    </Hash>
+                </DefaultItem>
+            </Array>
+        </Value>
+    </Setting>
+</otrs_config>

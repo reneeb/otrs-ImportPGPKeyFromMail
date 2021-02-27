@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2017 Perl-Services.de, http://www.perl-services.de/
+# Copyright (C) 2017 - 2021 Perl-Services.de, http://www.perl-services.de/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -41,29 +41,52 @@ sub Run {
 
     $LayoutObject->AddJSOnDocumentComplete(
         Code => q|
-            Core.Config.Set( 'PGPKeySelectFunction', function() {
-                var PGPSelect = $('#CryptKeyID');
-                if ( !PGPSelect.get(0) ) {
+            Core.Config.Set( 'SecuritySelectFunction', function() {
+                var SecSelect = $('#EmailSecurityOptions');
+                if ( !SecSelect.get(0) ) {
                     return;
                 }
-                else if ( Core.Config.Get('PGPKeySelected') == 1 ) {
+                else if ( Core.Config.Get('SecuritySelected') == 1 ) {
                     return;
                 }
 
-                var CryptOptions = $('#CryptKeyID option');
-                if ( CryptOptions.length == 2 && CryptOptions[1].value.match( /^PGP::Detached/ ) ) {
-                    PGPSelect.val( CryptOptions[1].value );
-                    PGPSelect.trigger('redraw.InputField');
-                    $('#CryptKeyID_Search ~ div > div[class="Remove"] > a').bind( 'click', function() {
-                        Core.Config.Set('PGPKeySelected', 1);
-                    });
-                }
+                var FormData = {
+                    TicketID: $('input[name="TicketID"]').val(),
+                    Dest: $('#Dest').val(),
+                    Customers: new Array(), 
+                };
+
+                $('input[name^="CustomerQueue_"]').each( function( i, v ) {
+                    FormData.Customers.push( $(v).val() );
+                });
+
+                $('input[name^="CcCustomerQueue_"]').each( function( i, v ) {
+                    FormData.Customers.push( $(v).val() );
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: Core.Config.Get('Baselink') + 'Action=AgentCheckPGPKeyExists',
+                    data: {
+                        SecData: JSON.stringify( FormData ),
+                    },
+                    success: function( response ) {
+                        if ( response.KeyExists ) {
+                            var SecSelect = $('#EmailSecurityOptions');
+                            SecSelect.val( 'PGP::-::Encrypt' );
+                            SecSelect.trigger('redraw.InputField');
+                            Core.Config.Set('SecuritySelected', 1);
+                        }
+                    }
+                });
             });
 
-            var SelectFunction = Core.Config.Get( 'PGPKeySelectFunction');
-            SelectFunction();
+            var SelectFunction = Core.Config.Get( 'SecuritySelectFunction');
+            Core.App.Ready( function() {
+                SelectFunction();
+            });
 
-            Core.App.Subscribe( 'Event.AJAX.FormUpdate.Callback', Core.Config.Get( 'PGPKeySelectFunction' ) );
+            Core.App.Subscribe( 'Event.AJAX.FormUpdate.Callback', Core.Config.Get( 'SecuritySelectFunction' ) );
         |,
     );
 
